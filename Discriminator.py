@@ -22,9 +22,9 @@ class Discriminator(nn.Module):
         # Second and third layer
         multiplier = 1
         for n in range(N_INNER_LAYERS):
-            architecture += [nn.Conv2d(FIRST_LAYER_FILTERS * multiplier, FIRST_LAYER_FILTERS * (multiplier ** 2), kernel_size=filter_size, stride=2,
+            architecture += [nn.Conv2d(FIRST_LAYER_FILTERS * multiplier, FIRST_LAYER_FILTERS * multiplier * 2, kernel_size=filter_size, stride=2,
                                        padding=padding_width, bias=use_bias)]
-            architecture += nn.BatchNorm2d(FIRST_LAYER_FILTERS * (multiplier ** 2))
+            architecture += nn.BatchNorm2d(FIRST_LAYER_FILTERS * multiplier * 2)
             architecture += nn.LeakyReLU(0.2, True)
             multiplier *= 2
 
