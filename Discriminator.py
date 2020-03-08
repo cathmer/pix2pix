@@ -1,7 +1,7 @@
 import torch.nn as nn
 
 FIRST_LAYER_FILTERS = 64
-INPUT_CHANNELS = 3
+INPUT_CHANNELS = 6
 N_INNER_LAYERS = 2
 
 
