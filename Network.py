@@ -10,7 +10,7 @@ class UNetGenerator(nn.Module):
         super(UNetGenerator, self).__init__()
         n = FIRST_LAYER_FILTERS
 
-        # Builds the network from inside out
+        # Builds the network recursively from inside out
         block = InnermostBlock(n * 8, n * 8)
         for i in range(3):
             block = RegularBlock(n * 8, n * 8, block, use_dropout=True)
