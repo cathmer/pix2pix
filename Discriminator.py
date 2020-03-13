@@ -7,6 +7,7 @@ N_INNER_LAYERS = 2
 
 class Discriminator(nn.Module):
     def __init__(self):
+        # TODO: Set Parameter for number of input channels (can be 3 for GAN, 6 for cGAN)
         """ Parameters:
         """
         super().__init__()
