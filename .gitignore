@@ -222,6 +222,7 @@ fabric.properties
 # Android studio 3.1+ serialized cache file
 .idea/caches/build_file_checksums.ser
 
-# 
 dataset/cityscapes/train/A/
 dataset/cityscapes/train/B/
+
+fcn-8s-cityscapes.caffemodel
