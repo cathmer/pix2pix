@@ -19,7 +19,6 @@ TODO'S:
 class Pix2PixOptimizer():
     def __init__(self, is_train=True, use_GAN=True, is_conditional=True, has_L1=True):
         # TODO: SET SELF.DEVICE AND PUT GANLOSS AND INPUT IMAGES TO THIS DEVICE
-        # TODO: Make it possible to run GAN or not, run it conditionally or not, run L1 or not
 
         # Create Generator network
         self.Gnet = UNetGenerator()
