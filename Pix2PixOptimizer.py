@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
-from Generator import UNetGenerator
+
 from Discriminator import Discriminator
+from Generator import UNetGenerator
 
 LR = 0.0002
 BETA1 = 0.5
@@ -16,7 +17,7 @@ TODO'S:
 '''
 
 
-class Pix2PixOptimizer():
+class Pix2PixOptimizer:
     def __init__(self, is_train=True, use_GAN=True, is_conditional=True, has_L1=True):
         # TODO: SET SELF.DEVICE AND PUT GANLOSS AND INPUT IMAGES TO THIS DEVICE
 
@@ -114,7 +115,6 @@ class Pix2PixOptimizer():
 
         # Backward propagate the losses
         self.loss_G.backward()
-
 
     def optimize(self):
         # Call forward, which puts a semantic image into the Generator which then creates an image from it
