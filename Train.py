@@ -12,10 +12,8 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int):
 
         for j, data in enumerate(data_loader):
             print("Iteration {}".format(j), end='\t\t')
-            model.set_input(data)
+            model.set_input(data, j + 1)
             model.optimize()
-
-
 
 if __name__ == '__main__':
     model = Pix2PixOptimizer(is_train=True, use_GAN=True, is_conditional=True, has_L1=True)

@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchvision as tv
 
 from Discriminator import Discriminator
 from Generator import UNetGenerator
@@ -33,6 +34,8 @@ class Pix2PixOptimizer:
         self.is_conditional = is_conditional
         self.use_GAN = use_GAN
 
+        self.is_train = is_train
+
         # If this is training, a discriminator and optimizers need to be initialized
         if is_train:
             # Create Discriminator network
@@ -48,13 +51,16 @@ class Pix2PixOptimizer:
             self.G_optimizer = torch.optim.Adam(self.Gnet.parameters(), lr=LR, betas=(BETA1, BETA2))
             self.D_optimizer = torch.optim.Adam(self.Dnet.parameters(), lr=LR, betas=(BETA1, BETA2))
 
-    def set_input(self, images):
+    def set_input(self, images, img_name):
         self.real_A = images['A']
         self.real_B = images['B']
+        self.img_name = img_name
 
     def forward(self):
         # The forward pass, passes a cityscape image to the Generator network which should generate a city image from it
         self.generated_B = self.Gnet.forward(self.real_A)
+        if not self.is_train:
+            tv.utils.save_image(self.generated_B, "./dataset/cityscapes/results_images/{}_leftImg8bit.png".format(self.img_name))
 
     def backward_d(self):
         if self.is_conditional:
