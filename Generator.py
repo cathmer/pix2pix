@@ -119,5 +119,3 @@ class InnermostBlock(UNetBlock):
     # Pass the input to this model as output and concatenate it with the input passed through the model.
     def forward(self, x):
         return torch.cat([x, self.model(x)], 1)
-
-
