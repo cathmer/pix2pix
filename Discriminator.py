@@ -16,17 +16,17 @@ class Discriminator(nn.Module):
         architecture = []
 
         # First layer, does not apply batchNorm
-        architecture += nn.Conv2d(input_channels, FIRST_LAYER_FILTERS, kernel_size=filter_size, stride=2,
-                                  padding=padding_width)
-        architecture += nn.LeakyReLU(0.2, True)
+        architecture += [nn.Conv2d(input_channels, FIRST_LAYER_FILTERS, kernel_size=filter_size, stride=2,
+                                  padding=padding_width)]
+        architecture += [nn.LeakyReLU(0.2, True)]
 
         # Second and third layer
         multiplier = 1
         for n in range(N_INNER_LAYERS):
             architecture += [nn.Conv2d(FIRST_LAYER_FILTERS * multiplier, FIRST_LAYER_FILTERS * multiplier * 2,
                                        kernel_size=filter_size, stride=2, padding=padding_width, bias=use_bias)]
-            architecture += nn.BatchNorm2d(FIRST_LAYER_FILTERS * multiplier * 2)
-            architecture += nn.LeakyReLU(0.2, True)
+            architecture += [nn.BatchNorm2d(FIRST_LAYER_FILTERS * multiplier * 2)]
+            architecture += [nn.LeakyReLU(0.2, True)]
             multiplier *= 2
 
         # Final layer, outputs a single value, which represents the belief of the discriminator

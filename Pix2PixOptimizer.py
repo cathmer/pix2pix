@@ -67,7 +67,8 @@ class Pix2PixOptimizer:
         # Detach the generated image to prevent backpropagation to the generator
         pred_generated = self.Dnet(generatedImg.detach())
         # Get the GANLoss, where the target is False (since it is a generated and therefore fake image)
-        self.loss_D_generated = self.GANLoss(pred_generated, False)
+        target_tensor = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated)
+        self.loss_D_generated = self.GANLoss(pred_generated, target_tensor)
 
         # Now input a real image
         if self.is_conditional:
@@ -79,7 +80,8 @@ class Pix2PixOptimizer:
         # Get the prediction of the network for the real image
         pred_real = self.Dnet(realImg)
         # Get the GANLoss, where the target is true (since it is a real image)
-        self.loss_D_real = self.GANLoss(pred_real, True)
+        target_tensor = torch.tensor(0.0).requires_grad_(False).expand_as(pred_generated)
+        self.loss_D_real = self.GANLoss(pred_real, target_tensor)
         # Combine the losses calculated above
         self.loss_D = 0.5 * (self.loss_D_generated + self.loss_D_real)
         # Backward propagate the losses
@@ -99,7 +101,8 @@ class Pix2PixOptimizer:
             pred_generated = self.Dnet(generatedImg)
             # Calculate the GAN Loss; since the Generator wants to fool the Discriminator, the target is reversed here
             # (i.e. the target is True, indicating a real image, although the input is a generated image)
-            self.loss_G_GAN = self.GANLoss(pred_generated, True)
+            target_tensor = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated)
+            self.loss_G_GAN = self.GANLoss(pred_generated, target_tensor)
         else:
             generatedImg = self.generated_B
 
@@ -141,6 +144,9 @@ class Pix2PixOptimizer:
         self.backward_g()
         # Update weights
         self.G_optimizer.step()
+
+        # Print the error
+        print(self.loss_G)
 
     def set_requires_grad(self, netD, requires_grad):
         for param in netD.parameters():

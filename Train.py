@@ -8,11 +8,13 @@ from Pix2PixOptimizer import Pix2PixOptimizer
 
 def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int):
     for i in range(no_epochs):
-        print('Epoch %s of %s', i + 1, no_epochs)
+        print('Epoch {} of {}'.format(i + 1, no_epochs))
 
-        for data in data_loader:
+        for j, data in enumerate(data_loader):
+            print("Iteration {}".format(j), end='\t\t')
             model.set_input(data)
             model.optimize()
+
 
 
 if __name__ == '__main__':
