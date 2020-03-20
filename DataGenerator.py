@@ -16,6 +16,24 @@ def split_horizontally(image: Image) -> Tuple[Image, Image]:
     return image.crop((0, 0, width / 2, height)), image.crop((width / 2, 0, width, height))
 
 
+def make_dir(path: os.path):
+    if not os.path.isdir(path):
+        os.makedirs(path)
+
+
+def split_and_save(path: os.path):
+    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+
+    make_dir(os.path.join(path, 'A'))
+    make_dir(os.path.join(path, 'B'))
+
+    for i, f in enumerate(files):
+        image = PIL.Image.open(os.path.join(path, f))
+        a_image, b_image = split_horizontally(image)
+        a_image.save(os.path.join(path, 'A', 'A_' + f), 'JPEG')
+        b_image.save(os.path.join(path, 'B', 'B_' + f), 'JPEG')
+
+
 # Custom data set to handle ab images
 class DataSet(Dataset):
 
@@ -45,8 +63,6 @@ def get_data_loader(path_to_data: os.path, batch_size: int) -> DataLoader:
         shuffle=True
     )
 
-# train_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'train')
-# val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
-#
-# x = get_data_loader(train_dir, 64)
-#
+
+val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
+split_and_save(val_dir)

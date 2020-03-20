@@ -16,7 +16,6 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int):
             model.optimize()
 
 
-
 if __name__ == '__main__':
     model = Pix2PixOptimizer(is_train=True, use_GAN=True, is_conditional=True, has_L1=True)
     train_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'train')
