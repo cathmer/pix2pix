@@ -17,7 +17,7 @@ class Discriminator(nn.Module):
 
         # First layer, does not apply batchNorm
         architecture += [nn.Conv2d(input_channels, FIRST_LAYER_FILTERS, kernel_size=filter_size, stride=2,
-                                  padding=padding_width)]
+                                   padding=padding_width)]
         architecture += [nn.LeakyReLU(0.2, True)]
 
         # Second and third layer
