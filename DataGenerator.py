@@ -13,7 +13,7 @@ from torch.utils.data import Dataset
 def split_horizontally(image: Image) -> Tuple[Image, Image]:
     width, height = image.size
     # PIL.Image.crop(box=None): The box is a 4-tuple defining the (left, upper), (right, lower) pixel coordinate
-    return image.crop((0, 0, width / 2, height)), image.crop((width / 2, 0, width, height))
+    return image.crop((width / 2, 0, width, height)), image.crop((0, 0, width / 2, height))
 
 
 def make_dir(path: os.path):
@@ -64,5 +64,5 @@ def get_data_loader(path_to_data: os.path, batch_size: int) -> DataLoader:
     )
 
 
-val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
-split_and_save(val_dir)
+# val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
+# split_and_save(val_dir)
