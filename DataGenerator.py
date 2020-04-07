@@ -29,6 +29,7 @@ def split_and_save(path: os.path):
 
     for i, f in enumerate(files):
         image = PIL.Image.open(os.path.join(path, f))
+
         a_image, b_image = split_horizontally(image)
         a_image.save(os.path.join(path, 'A', 'A_' + f), 'JPEG')
         b_image.save(os.path.join(path, 'B', 'B_' + f), 'JPEG')
@@ -38,7 +39,8 @@ def split_and_save(path: os.path):
 class DataSet(Dataset):
 
     def __init__(self, path_to_data: os.path):
-        self._paths_to_pictures = [os.path.join(path_to_data, file_name) for file_name in os.listdir(path_to_data)]
+        self._paths_to_pictures = [os.path.join(path_to_data, file_name) for file_name in os.listdir(path_to_data)
+                                   if os.path.isfile(os.path.join(path_to_data, file_name))]
 
     def __getitem__(self, index: int) -> Dict[str, Tensor]:
         path_to_picture = self._paths_to_pictures[index]
@@ -55,14 +57,14 @@ class DataSet(Dataset):
         return len(self._paths_to_pictures)
 
 
-def get_data_loader(path_to_data: os.path, batch_size: int) -> DataLoader:
+def get_data_loader(path_to_data: os.path, batch_size: int, shuffle: bool = True) -> DataLoader:
     return DataLoader(
         dataset=DataSet(path_to_data),
         batch_size=batch_size,
         num_workers=0,
-        shuffle=True
+        shuffle=shuffle
     )
 
 
-# val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
-# split_and_save(val_dir)
+val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
+split_and_save(val_dir)
