@@ -30,13 +30,13 @@ def is_valid_stored_model(path: os.path, epoch: int):
         os.path.join(path, str(epoch) + '_Gnet'))
 
 
-def get_trained_pix2pix(path_to_Gnet: os.path, path_to_Dnet: os.path, use_cuda: bool, use_Gan: bool, has_L1: bool):
+def get_trained_pix2pix(path_to_Gnet: os.path, path_to_Dnet: os.path, use_cuda: bool, use_Gan: bool, is_conditional: bool, has_L1: bool):
     if path_to_Dnet is not None:
         is_train = True
     else:
         is_train = False
 
-    model = Pix2PixOptimizer(is_train=is_train, use_GAN=use_Gan, is_conditional=True, has_L1=has_L1, use_cuda=use_cuda)
+    model = Pix2PixOptimizer(is_train=is_train, use_GAN=use_Gan, is_conditional=is_conditional, has_L1=has_L1, use_cuda=use_cuda)
     model.Gnet.load_state_dict(torch.load(path_to_Gnet))
     model.Gnet.eval()
 
@@ -71,12 +71,12 @@ def start_training(model: Pix2PixOptimizer, no_epochs: int, start):
     train(model=model, data_loader=data_loader, no_epochs=no_epochs, save_path=save_path, start=start)
 
 
-def start_new_training(use_cuda: bool, use_GAN: bool, has_L1: bool, no_epochs: int):
-    model = Pix2PixOptimizer(is_train=True, use_GAN=use_GAN, is_conditional=True, has_L1=has_L1, use_cuda=use_cuda)
+def start_new_training(use_cuda: bool, use_GAN: bool, is_conditional: bool, has_L1: bool, no_epochs: int):
+    model = Pix2PixOptimizer(is_train=True, use_GAN=use_GAN, is_conditional=is_conditional, has_L1=has_L1, use_cuda=use_cuda)
     start_training(model, no_epochs, start=1)
 
 
-def restart_training(date_time: str, no_epochs: int, use_cuda: bool, use_Gan: bool, has_L1: bool):
+def restart_training(date_time: str, no_epochs: int, use_cuda: bool, use_Gan: bool, is_conditional: bool, has_L1: bool):
     path = os.path.join(os.getcwd(), 'storage', date_time)
 
     if os.path.isdir(path):
@@ -94,7 +94,7 @@ def restart_training(date_time: str, no_epochs: int, use_cuda: bool, use_Gan: bo
                     path_to_Dnet = os.path.join(path, str(epoch) + '_Dnet')
 
                     model = get_trained_pix2pix(path_to_Gnet, path_to_Dnet, use_cuda=use_cuda, use_Gan=use_Gan,
-                                                has_L1=has_L1)
+                                                is_conditional=is_conditional, has_L1=has_L1)
 
                     start_training(model, no_epochs, start=epoch + 1)
                     restart = True
@@ -115,7 +115,7 @@ def generate(dataset: str, date_time: str, epoch: int, use_cuda: bool, no_images
     os.makedirs(storage_path)
 
     if os.path.isfile(path):
-        model = get_trained_pix2pix(path_to_Gnet=path, path_to_Dnet=None, use_cuda=use_cuda, use_Gan=True, has_L1=True)
+        model = get_trained_pix2pix(path_to_Gnet=path, path_to_Dnet=None, use_cuda=use_cuda, use_Gan=True, is_conditional=True, has_L1=True)
         data_loader = DataGenerator.get_data_loader(os.path.join(os.getcwd(), 'dataset', dataset, 'val'), 1,
                                                     shuffle=False)
 
@@ -133,10 +133,10 @@ def generate(dataset: str, date_time: str, epoch: int, use_cuda: bool, no_images
 
 if __name__ == '__main__':
     # Train a model
-    start_new_training(use_cuda=False, use_GAN=True, has_L1=True, no_epochs=200)
+    # start_new_training(use_cuda=True, use_GAN=True, is_conditional=True, has_L1=True, no_epochs=200)
 
     # Restart a model
-    # restart_training(date_time='20200407_145830', no_epochs=200, use_cuda=False, use_Gan=True, has_L1=True)
+    # restart_training(date_time='20200408_102555', no_epochs=200, use_cuda=True, use_Gan=True, is_conditional=True, has_L1=True)
 
     # Look at content produced by model
-    # generate('cityscapes', '20200407_145830', 2, use_cuda=False)
+    generate('cityscapes', '20200408_102555', 8, use_cuda=False)

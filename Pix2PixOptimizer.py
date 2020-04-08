@@ -16,11 +16,6 @@ class Pix2PixOptimizer:
         # self.save_images = save_images
         self.use_cuda = use_cuda and torch.cuda.is_available()
 
-        # create path to save image
-        # if self.save_images:
-        #     self.path = os.path.join(os.getcwd(), 'results', 'cityscapes', datetime.now().strftime('%Y%m%d_%H%M%S'))
-        #     os.makedirs(self.path)
-
         # Create Generator network
         self.Gnet = UNetGenerator()
         # Apply cuda
@@ -69,7 +64,8 @@ class Pix2PixOptimizer:
     def forward(self, return_image=False):
         # The forward pass, passes a cityscape image to the Generator network which should generate a city image from it
         if self.use_cuda:
-            self.generated_B = self.Gnet.forward(self.real_A).cuda()
+            self.Gnet.cuda()
+            self.generated_B = self.Gnet.forward(self.real_A.cuda()).cuda()
         else:
             self.generated_B = self.Gnet.forward(self.real_A)
 
@@ -169,11 +165,7 @@ class Pix2PixOptimizer:
                 self.loss_G_GAN = self.GANLoss(pred_generated.cuda(), target_tensor.cuda()).cuda()
             else:
                 self.loss_G_GAN = self.GANLoss(pred_generated, target_tensor)
-        else:
-            # TODO --> unused
-            generatedImg = self.generated_B
 
-        # TODO --> is this correct, does not work with var generatedImg
         # Now calculate the L1 Loss between the generated image and the real image
         self.loss_G_L1 = self.L1Loss(self.generated_B, self.real_B) * self.lamb
 
