@@ -20,7 +20,7 @@ def segrun(net, in_):
 def fast_hist(a, b, n):
     # print('saving')
     # sio.savemat('/tmp/fcn_debug/xx.mat', {'a':a, 'b':b, 'n':n})
-    
+
     k = np.where((a >= 0) & (a < n))[0]
     bc = np.bincount(n * a[k].astype(int) + b[k], minlength=n**2)
     if len(bc) != n**2:

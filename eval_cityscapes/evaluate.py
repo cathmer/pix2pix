@@ -36,7 +36,6 @@ def main():
                     caffe.TEST)
 
     label_frames = CS.list_label_frames(args.split)
-    print('Network initialized!!!!!!!!!!!!!!!!!!!!!')
     hist_perframe = np.zeros((n_cl, n_cl))
 
     print(label_frames)
@@ -46,7 +45,7 @@ def main():
         city = idx.split('_')[0]
         # idx is city_shot_frame
         label = CS.load_label(args.split, city, idx)
-        im_file = args.result_dir + '/' + idx + '_leftImg8bit.jpg'
+        im_file = args.result_dir + '/' + idx + '.png'
         im = np.array(Image.open(im_file))
         # im = scipy.misc.imresize(im, (256, 256))
         im = scipy.misc.imresize(im, (label.shape[1], label.shape[2]))

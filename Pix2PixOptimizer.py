@@ -59,8 +59,8 @@ class Pix2PixOptimizer:
     def forward(self):
         # The forward pass, passes a cityscape image to the Generator network which should generate a city image from it
         self.generated_B = self.Gnet.forward(self.real_A)
-        if not self.is_train:
-            tv.utils.save_image(self.generated_B, "./dataset/cityscapes/results_images/{}_leftImg8bit.png".format(self.img_name))
+        # if not self.is_train:
+        tv.utils.save_image(self.generated_B, "./dataset/cityscapes/results_images/{}_leftImg8bit.png".format(self.img_name))
 
     def backward_d(self):
         if self.is_conditional:
