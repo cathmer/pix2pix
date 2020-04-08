@@ -139,4 +139,4 @@ if __name__ == '__main__':
     # restart_training(date_time='20200407_145830', no_epochs=200, use_cuda=False, use_Gan=True, has_L1=True)
 
     # Look at content produced by model
-    #generate('cityscapes', '20200407_145830', 2, use_cuda=False)
+    # generate('cityscapes', '20200407_145830', 2, use_cuda=False)
