@@ -60,7 +60,8 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
 
                 if (j + 1) % 10 == 0:
                     print("Iteration: " + str(j + 1) + '\t' + str(loss))
-        save_network(model, i, save_path)
+        if i + 1 % 10 == 0:
+            save_network(model, i, save_path)
 
 
 def start_training(model: Pix2PixOptimizer, no_epochs: int, start):
