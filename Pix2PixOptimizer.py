@@ -184,8 +184,9 @@ class Pix2PixOptimizer:
 
         # Apply cuda
         if self.use_cuda and torch.cuda.is_available():
-            self.loss_G_L1.cuda()
             self.loss_G.cuda()
+            if self.has_L1:
+                self.loss_G_L1.cuda()
 
         # Backward propagate the losses
         self.loss_G.backward()
