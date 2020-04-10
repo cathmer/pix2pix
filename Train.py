@@ -133,10 +133,10 @@ def generate(dataset: str, date_time: str, epoch: int, use_cuda: bool, no_images
 
 if __name__ == '__main__':
     # Train a model
-    # start_new_training(use_cuda=True, use_GAN=True, is_conditional=True, has_L1=True, no_epochs=200)
+    start_new_training(use_cuda=True, use_GAN=True, is_conditional=True, has_L1=True, no_epochs=200)
 
     # Restart a model
     # restart_training(date_time='20200408_102555', no_epochs=200, use_cuda=True, use_Gan=True, is_conditional=True, has_L1=True)
 
     # Look at content produced by model
-    generate('cityscapes', '20200408_102555', 8, use_cuda=False)
+    # generate('cityscapes', '20200408_102555', 8, use_cuda=False)

@@ -56,7 +56,7 @@ class cityscapes:
         Load label image as 1 x height x width integer array of label indices.
         The leading singleton dimension is required by the loss.
         """
-        label = Image.open('{}/{}_gtFine_labelIds.png'.format(self.dir, idx))
+        label = Image.open('{}/{}.png'.format(self.dir, idx))
         label = self.assign_trainIds(label)  # get proper labels for eval
         label = np.array(label, dtype=np.uint8)
         label = label[np.newaxis, ...]
@@ -113,22 +113,10 @@ class cityscapes:
         """
         def file2idx(f):
             """Helper to convert file path into frame ID"""
-            city, shot, frame = (os.path.basename(f).split('_')[:3])
-            return "_".join([city, shot, frame])
+            id = (os.path.basename(f).split('.')[0])
+            return id
         frames = []
-
-
-        imgsPath = '{}/*'.format(self.dir)
-        # print(imgsPath)
-        # cities = [os.path.basename(f) for f in glob.glob(imgsPath)]
-        # cities = [os.path.basename(f) for f in glob.glob('{}/gtFine/{}/*'.format(self.dir, split))]
-        # print(cities)
-        # for c in cities:
-            # files = sorted(glob.glob('{}/gtFine/{}/{}/*labelIds.png'.format(self.dir, split, c)))
-        labelPath = '{}/*labelIds.png'.format(imgsPath)
-        # print(labelPath)
-        files = sorted(glob.glob('{}/*labelIds.png'.format(self.dir)))
-        # print(files)
+        files = sorted(glob.glob('{}/*.png'.format(self.dir)))
         frames.extend([file2idx(f) for f in files])
         return frames
 
