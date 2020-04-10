@@ -227,5 +227,7 @@ dataset/cityscapes/train/B/
 dataset/cityscapes/val/A/
 dataset/cityscapes/val/B/
 dataset/cityscapes/resized_labels/
+storage/
+results/
 
 fcn-8s-cityscapes.caffemodel

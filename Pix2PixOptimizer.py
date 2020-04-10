@@ -4,6 +4,8 @@ import torch.nn as nn
 from Discriminator import Discriminator
 from Generator import UNetGenerator
 
+import torchvision
+
 LR = 0.0002
 BETA1 = 0.5
 BETA2 = 0.999
@@ -23,6 +25,7 @@ class Pix2PixOptimizer:
             self.Gnet.cuda()
 
         # If has_L1 is true, the optimizer is trained with an L1 loss
+        self.has_L1 = has_L1
         if has_L1:
             self.lamb = 100
         else:
@@ -89,7 +92,7 @@ class Pix2PixOptimizer:
             pred_generated = self.Dnet(generatedImg.detach())
 
         # Get the GANLoss, where the target is False (since it is a generated and therefore fake image)
-        target_tensor1 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated)
+        target_tensor1 = torch.tensor(0.0).requires_grad_(False).expand_as(pred_generated)
 
         # Apply cuda
         if self.use_cuda and torch.cuda.is_available():
@@ -120,10 +123,10 @@ class Pix2PixOptimizer:
 
         # Get the GANLoss, where the target is true (since it is a real image)
         if self.use_cuda and torch.cuda.is_available():
-            target_tensor2 = torch.tensor(0.0).requires_grad_(False).expand_as(pred_generated).cuda()
+            target_tensor2 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated).cuda()
             self.loss_D_real = self.GANLoss(pred_real, target_tensor2).cuda()
         else:
-            target_tensor2 = torch.tensor(0.0).requires_grad_(False).expand_as(pred_generated)
+            target_tensor2 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated)
             self.loss_D_real = self.GANLoss(pred_real, target_tensor2)
 
         # Combine the losses calculated above
@@ -167,11 +170,14 @@ class Pix2PixOptimizer:
                 self.loss_G_GAN = self.GANLoss(pred_generated, target_tensor)
 
         # Now calculate the L1 Loss between the generated image and the real image
-        self.loss_G_L1 = self.L1Loss(self.generated_B, self.real_B) * self.lamb
+        if self.has_L1:
+            self.loss_G_L1 = self.L1Loss(self.generated_B, self.real_B) * self.lamb
 
         # Combine the losses
-        if self.use_GAN:
+        if self.use_GAN and self.has_L1:
             self.loss_G = self.loss_G_GAN + self.loss_G_L1
+        elif self.use_GAN:
+            self.loss_G = self.loss_G_GAN
         else:
             # If not using GAN, simply use L1 loss
             self.loss_G = self.loss_G_L1
