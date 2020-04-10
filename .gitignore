@@ -224,5 +224,8 @@ fabric.properties
 
 dataset/cityscapes/train/A/
 dataset/cityscapes/train/B/
+dataset/cityscapes/val/A/
+dataset/cityscapes/val/B/
+dataset/cityscapes/resized_labels/
 
 fcn-8s-cityscapes.caffemodel
