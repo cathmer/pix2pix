@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import torch.nn.init as weight_init
+
 FIRST_LAYER_FILTERS = 64
 INPUT_OUTPUT_CHANNELS = 3
 
@@ -27,16 +29,22 @@ class UNetBlock(nn.Module):
     def __init__(self, input_channels, output_channels):
         super().__init__()
 
+        mean = 0.0
+        std = 0.02
+
         # This is the "regular" convolution, extracting features and making the image half as big through
         # the stride combined with kernel size and padding
         self.encodeconv = nn.Conv2d(input_channels, output_channels, kernel_size=4, stride=2, padding=1)
+        weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # Function for batch normalization, applied at every layer. The encode normalization has output_channels
         # because it is applied after encode convolution.
         self.encodenorm = nn.BatchNorm2d(output_channels)
+        weight_init.normal_(self.encodenorm.weight, mean=mean, std=std)
         # The decodenorm has input_channels as argument because it is applied after the decode convolution,
         # which has input_channels as output.
         self.decodenorm = nn.BatchNorm2d(input_channels)
+        weight_init.normal_(self.decodenorm.weight, mean=mean, std=std)
 
         # As stated in the paper, leaky Relu with slope 0.2 is used for encoding
         self.encoderelu = nn.LeakyReLU(0.2, True)
