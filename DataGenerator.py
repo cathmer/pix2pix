@@ -7,6 +7,7 @@ from PIL.Image import Image
 from torch import Tensor
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
+import random
 
 
 # Image splitter
@@ -15,6 +16,13 @@ def split_horizontally(image: Image) -> Tuple[Image, Image]:
     # PIL.Image.crop(box=None): The box is a 4-tuple defining the (left, upper), (right, lower) pixel coordinate
     return image.crop((width / 2, 0, width, height)), image.crop((0, 0, width / 2, height))
 
+def preprocess(image: Image, outputImage):
+    image.resize((286, 286), Image.BICUBIC)
+    image.crop((256, 256))
+
+    if random.random() > 0.5:
+        image.transpose(Image.FLIP_LEFT_RIGHT)
+        outputImage.transpose(Image.FLIP_LEFT_RIGHT)
 
 def make_dir(path: os.path):
     if not os.path.isdir(path):
@@ -47,6 +55,7 @@ class DataSet(Dataset):
 
         ab_image = PIL.Image.open(path_to_picture).convert('RGB')
         a_image, b_image = split_horizontally(ab_image)
+        preprocess(a_image, b_image)
 
         a_image = torchvision.transforms.ToTensor()(a_image)
         b_image = torchvision.transforms.ToTensor()(b_image)
@@ -65,6 +74,5 @@ def get_data_loader(path_to_data: os.path, batch_size: int, shuffle: bool = True
         shuffle=shuffle
     )
 
-
-val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
-split_and_save(val_dir)
+# val_dir = os.path.join(os.getcwd(), 'dataset', 'cityscapes', 'val')
+# split_and_save(val_dir)
