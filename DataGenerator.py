@@ -17,12 +17,14 @@ def split_horizontally(image: Image) -> Tuple[Image, Image]:
     return image.crop((width / 2, 0, width, height)), image.crop((0, 0, width / 2, height))
 
 def preprocess(image: Image, outputImage):
-    image.resize((286, 286), Image.BICUBIC)
-    image.crop((256, 256))
+    image.resize((286, 286), PIL.Image.BICUBIC)
+    x = random.randint(0, 286 - 256)
+    y = random.randint(0, 286 - 256)
+    image.crop((x, y, x + 256, y + 256))
 
     if random.random() > 0.5:
-        image.transpose(Image.FLIP_LEFT_RIGHT)
-        outputImage.transpose(Image.FLIP_LEFT_RIGHT)
+        image.transpose(PIL.Image.FLIP_LEFT_RIGHT)
+        outputImage.transpose(PIL.Image.FLIP_LEFT_RIGHT)
 
 def make_dir(path: os.path):
     if not os.path.isdir(path):
