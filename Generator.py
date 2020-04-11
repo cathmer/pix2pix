@@ -65,12 +65,12 @@ class RegularBlock(UNetBlock):
         weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # Encode does Relu, then Convolution, the Normalization
-        encode = [self.encodeconv, self.encodenorm, self.encoderelu]
+        encode = [self.encoderelu, self.encodeconv, self.encodenorm]
         # Decode does Relu, then reverse Convolution, the Normalization
         if use_dropout:
-            decode = [decodeconv, self.decodenorm, nn.Dropout(0.5), self.decoderelu]
+            decode = [self.decoderelu, decodeconv, self.decodenorm, nn.Dropout(0.5)]
         else:
-            decode = [decodeconv, self.decodenorm, self.decoderelu]
+            decode = [self.decoderelu, decodeconv, self.decodenorm]
 
         # Combine the blocks with all blocks in between
         model = encode + [inner_model] + decode
@@ -92,7 +92,7 @@ class OutermostBlock(UNetBlock):
         weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # This is the start of the network, so first only Convolution is applied to the input image
-        encode = [self.encodeconv, self.encoderelu]
+        encode = [self.encoderelu, self.encodeconv]
 
         # Decode, which uses regular ReLU, then convolution to 3 channels (output image) and finally a TanH function as
         # specified in the paper
