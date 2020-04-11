@@ -57,8 +57,8 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
                 break
             else:
                 model.set_input(data)
-                loss = model.optimize()
-                cumulativeLoss += loss.item()
+                gloss, dloss = model.optimize()
+                cumulativeLoss += gloss.item()
                 
                 if j == 0:
                     image = model.forward(return_image=True)
@@ -67,7 +67,7 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
                     torchvision.utils.save_image(image, os.path.join(os.getcwd(), 'training', str(i + 1) + '_output.png'))
 
                 if (j + 1) % 10 == 0:
-                    print("Iteration: " + str(j + 1) + '\t' + str(loss.item()))
+                    print("Iteration: " + str(j + 1) + '\tGenerator loss: ' + str(gloss.item()) + '\tDiscriminator loss: ' + str(dloss.item()))
 
         avgLoss = cumulativeLoss / len(data_loader)
         print("Average loss in this epoch was: " + str(avgLoss))

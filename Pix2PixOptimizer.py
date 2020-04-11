@@ -123,14 +123,14 @@ class Pix2PixOptimizer:
 
         # Get the GANLoss, where the target is true (since it is a real image)
         if self.use_cuda and torch.cuda.is_available():
-            target_tensor2 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated).cuda()
+            target_tensor2 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_real).cuda()
             self.loss_D_real = self.GANLoss(pred_real, target_tensor2).cuda()
         else:
-            target_tensor2 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_generated)
+            target_tensor2 = torch.tensor(1.0).requires_grad_(False).expand_as(pred_real)
             self.loss_D_real = self.GANLoss(pred_real, target_tensor2)
 
         # Combine the losses calculated above
-        self.loss_D = 0.5 * (self.loss_D_generated + self.loss_D_real)
+        self.loss_D = 0.25 * (self.loss_D_generated + self.loss_D_real)
         # Backward propagate the losses
 
         # Apply cuda
@@ -218,7 +218,7 @@ class Pix2PixOptimizer:
         self.G_optimizer.step()
 
         # Return the error
-        return self.loss_G
+        return self.loss_G, self.loss_D
 
     def set_requires_grad(self, netD, requires_grad):
         for param in netD.parameters():
