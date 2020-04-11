@@ -50,6 +50,7 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
           debug: bool = False):
     for i in range(start - 1, no_epochs):
         print('Epoch {} of {}'.format(i + 1, no_epochs))
+        cumulativeLoss = 0.0
 
         for j, data in enumerate(data_loader):
             if debug and j == 10:
@@ -57,6 +58,7 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
             else:
                 model.set_input(data)
                 loss = model.optimize()
+                cumulativeLoss += loss.item()
                 
                 if j == 0:
                     image = model.forward(return_image=True)
@@ -65,7 +67,10 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
                     torchvision.utils.save_image(image, os.path.join(os.getcwd(), 'training', str(i + 1) + '_output.png'))
 
                 if (j + 1) % 10 == 0:
-                    print("Iteration: " + str(j + 1) + '\t' + str(loss))
+                    print("Iteration: " + str(j + 1) + '\t' + str(loss.item()))
+
+        avgLoss = cumulativeLoss / len(data_loader)
+        print("Average loss in this epoch was: " + str(avgLoss))
         if (i + 1) % 10 == 0:
             save_network(model, i, save_path)
 

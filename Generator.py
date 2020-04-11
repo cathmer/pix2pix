@@ -6,6 +6,9 @@ import torch.nn.init as weight_init
 FIRST_LAYER_FILTERS = 64
 INPUT_OUTPUT_CHANNELS = 3
 
+mean = 0.0
+std = 0.02
+
 
 class UNetGenerator(nn.Module):
     def __init__(self):
@@ -28,9 +31,6 @@ class UNetGenerator(nn.Module):
 class UNetBlock(nn.Module):
     def __init__(self, input_channels, output_channels):
         super().__init__()
-
-        mean = 0.0
-        std = 0.02
 
         # This is the "regular" convolution, extracting features and making the image half as big through
         # the stride combined with kernel size and padding
@@ -62,6 +62,7 @@ class RegularBlock(UNetBlock):
         # equal to the number of input channels of the corresponding block because of the symmetric nature of the
         # network.
         decodeconv = nn.ConvTranspose2d(output_channels * 2, input_channels, kernel_size=4, stride=2, padding=1)
+        weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # Encode does Relu, then Convolution, the Normalization
         encode = [self.encodeconv, self.encodenorm, self.encoderelu]
@@ -88,6 +89,7 @@ class OutermostBlock(UNetBlock):
         # Because of the skip connection, the decode convolution has double the number of filters as the corresponding
         # encode convolution.
         decodeconv = nn.ConvTranspose2d(output_channels * 2, input_channels, kernel_size=4, stride=2, padding=1)
+        weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # This is the start of the network, so first only Convolution is applied to the input image
         encode = [self.encodeconv, self.encoderelu]
@@ -113,6 +115,7 @@ class InnermostBlock(UNetBlock):
         # In the innermostblock, the input and output for decoding is simply reversed. No skip connection here so
         # no need to take twice the number of output channels.
         decodeconv = nn.ConvTranspose2d(output_channels, input_channels, kernel_size=4, stride=2, padding=1)
+        weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # Encoding innermost does not apply normalization.
         encode = [self.encodeconv, self.encoderelu]
