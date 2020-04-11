@@ -43,7 +43,7 @@ class Pix2PixOptimizer:
                 self.Dnet = Discriminator(3)
 
             # Set GANLoss to Mean Squared Error
-            self.GANLoss = nn.BCEWithLogitsLoss()
+            self.GANLoss = nn.MSELoss()
             self.L1Loss = nn.L1Loss()
 
             # Apply cuda
