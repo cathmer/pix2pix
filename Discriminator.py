@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.init as weight_init
 
 FIRST_LAYER_FILTERS = 64
-N_INNER_LAYERS = 2
+N_INNER_LAYERS = 3
 
 
 class Discriminator(nn.Module):
@@ -46,6 +46,7 @@ class Discriminator(nn.Module):
                            padding=padding_width)
         weight_init.normal_(layer4.weight, mean=mean, std=std)
         architecture += [layer4]
+        architecture += [nn.Sigmoid()]
 
         self.model = nn.Sequential(*architecture)
 
