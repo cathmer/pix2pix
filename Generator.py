@@ -115,7 +115,7 @@ class InnermostBlock(UNetBlock):
         decodeconv = nn.ConvTranspose2d(output_channels, input_channels, kernel_size=4, stride=2, padding=1)
 
         # Encoding innermost does not apply normalization.
-        encode = [self.encodeconv, self.encodenorm, self.encoderelu]
+        encode = [self.encodeconv, self.encoderelu]
         # Decoding does apply normalization after relu and convolution
         decode = [decodeconv, self.decodenorm, self.decoderelu]
 

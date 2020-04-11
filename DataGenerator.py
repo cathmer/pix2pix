@@ -7,6 +7,7 @@ from PIL.Image import Image
 from torch import Tensor
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
+import torchvision
 import random
 
 

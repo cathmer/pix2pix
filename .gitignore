@@ -229,5 +229,6 @@ dataset/cityscapes/val/B/
 dataset/cityscapes/resized_labels/
 storage/
 results/
+training/
 
 fcn-8s-cityscapes.caffemodel
