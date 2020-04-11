@@ -64,16 +64,15 @@ class RegularBlock(UNetBlock):
         decodeconv = nn.ConvTranspose2d(output_channels * 2, input_channels, kernel_size=4, stride=2, padding=1)
 
         # Encode does Relu, then Convolution, the Normalization
-        encode = [self.encoderelu, self.encodeconv, self.encodenorm]
+        encode = [self.encodeconv, self.encodenorm, self.encoderelu]
         # Decode does Relu, then reverse Convolution, the Normalization
-        decode = [self.decoderelu, decodeconv, self.decodenorm]
+        if use_dropout:
+            decode = [decodeconv, self.decodenorm, nn.Dropout(0.5), self.decoderelu]
+        else:
+            decode = [decodeconv, self.decodenorm, self.decoderelu]
 
         # Combine the blocks with all blocks in between
         model = encode + [inner_model] + decode
-        # Some inner blocks use Dropout with a dropout rate of 50%
-        if use_dropout:
-            model = model + [nn.Dropout(0.5)]
-
         self.model = nn.Sequential(*model)
 
     # Define skip connections. The block will pass the input forward directly (x) and also pass it through
@@ -91,11 +90,11 @@ class OutermostBlock(UNetBlock):
         decodeconv = nn.ConvTranspose2d(output_channels * 2, input_channels, kernel_size=4, stride=2, padding=1)
 
         # This is the start of the network, so first only Convolution is applied to the input image
-        encode = [self.encodeconv]
+        encode = [self.encodeconv, self.encoderelu]
 
         # Decode, which uses regular ReLU, then convolution to 3 channels (output image) and finally a TanH function as
         # specified in the paper
-        decode = [self.decoderelu, decodeconv, nn.Tanh()]
+        decode = [decodeconv, nn.Tanh()]
 
         # Combine the blocks with all the blocks in between to make a Sequential model
         model = encode + [inner_model] + decode
@@ -116,9 +115,9 @@ class InnermostBlock(UNetBlock):
         decodeconv = nn.ConvTranspose2d(output_channels, input_channels, kernel_size=4, stride=2, padding=1)
 
         # Encoding innermost does not apply normalization.
-        encode = [self.encoderelu, self.encodeconv]
+        encode = [self.encodeconv, self.encodenorm, self.encoderelu]
         # Decoding does apply normalization after relu and convolution
-        decode = [self.decoderelu, decodeconv, self.decodenorm]
+        decode = [decodeconv, self.decodenorm, self.decoderelu]
 
         # No blocks in between so the blocks can simply be put in order in the model
         model = encode + decode
