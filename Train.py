@@ -57,6 +57,12 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
             else:
                 model.set_input(data)
                 loss = model.optimize()
+                
+                if j == 0:
+                    image = model.forward(return_image=True)
+                    torchvision.utils.save_image(data['A'], os.path.join(os.getcwd(), 'results', (i + 1) + '_input.png'))
+                    torchvision.utils.save_image(data['B'], os.path.join(os.getcwd(), 'results', (i + 1) + '_real.png'))
+                    torchvision.utils.save_image(image, os.path.join(os.getcwd(), 'results', (i + 1) + '_output.png'))
 
                 if (j + 1) % 10 == 0:
                     print("Iteration: " + str(j + 1) + '\t' + str(loss))
