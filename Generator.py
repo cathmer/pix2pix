@@ -92,11 +92,11 @@ class OutermostBlock(UNetBlock):
         weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # This is the start of the network, so first only Convolution is applied to the input image
-        encode = [self.encoderelu, self.encodeconv]
+        encode = [self.encodeconv]
 
         # Decode, which uses regular ReLU, then convolution to 3 channels (output image) and finally a TanH function as
         # specified in the paper
-        decode = [decodeconv, nn.Tanh()]
+        decode = [self.decoderelu, decodeconv, nn.Tanh()]
 
         # Combine the blocks with all the blocks in between to make a Sequential model
         model = encode + [inner_model] + decode
@@ -118,9 +118,9 @@ class InnermostBlock(UNetBlock):
         weight_init.normal_(self.encodeconv.weight, mean=mean, std=std)
 
         # Encoding innermost does not apply normalization.
-        encode = [self.encodeconv, self.encoderelu]
+        encode = [self.encoderelu, self.encodeconv]
         # Decoding does apply normalization after relu and convolution
-        decode = [decodeconv, self.decodenorm, self.decoderelu]
+        decode = [self.decoderelu, decodeconv, self.decodenorm]
 
         # No blocks in between so the blocks can simply be put in order in the model
         model = encode + decode
