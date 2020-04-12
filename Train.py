@@ -61,7 +61,7 @@ def print_avg_losses(epoch: int, no_epochs: int, cumulative_generator_loss: floa
     avg_discriminator_loss_str = str(format(cumulative_discriminator_loss / no_images, '8.5f'))
 
     sys.stdout.write('\r')
-    sys.stdout.write('Epoch ' + format(str(epoch), '3') + ' of ' + str(no_epochs) + " - Avg generator Loss: " + str(
+    sys.stdout.write('Epoch ' + format(str(epoch + 1), '3') + ' of ' + str(no_epochs) + " - Avg generator Loss: " + str(
         avg_generator_loss_str) + '\tAvg discriminator loss: ' + str(avg_discriminator_loss_str))
     sys.stdout.write('\n')
     sys.stdout.flush()
