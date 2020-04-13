@@ -60,7 +60,7 @@ class DataSet(Dataset):
 
         ab_image = PIL.Image.open(path_to_picture).convert('RGB')
         a_image, b_image = split_horizontally(ab_image)
-        a_image, b_image = preprocess(a_image, b_image)
+#         a_image, b_image = preprocess(a_image, b_image)
 
         a_image = torchvision.transforms.ToTensor()(a_image)
         b_image = torchvision.transforms.ToTensor()(b_image)
