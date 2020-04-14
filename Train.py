@@ -6,9 +6,21 @@ import torch
 import torchvision
 from torch.utils.data import DataLoader
 
+import argparse
+
 import DataGenerator
 from Pix2PixOptimizer import Pix2PixOptimizer
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--use_cuda", type=bool, default=False, help="Set to true for GPU usage")
+parser.add_argument("--use_GAN", type=bool, default=True, help="Set to true to use GAN")
+parser.add_argument("--is_conditional", type=bool, default=True, help="True for conditional GAN")
+parser.add_argument("--use_L1", type=bool, default=True, help="True to use L1")
+parser.add_argument("--restart", type=bool, default=False, help="True if you want to restart from a given model")
+parser.add_argument("--model_path", type=str, help="Set name of folder in which gNet and dNet are saved")
+parser.add_argument("--generate", type=str, default=False, help="Generate validation images from given model")
+parser.add_argument("--epoch", type=int, default=200, help="Epoch number of net to generate ima")
+args = parser.parse_args()
 
 def save_network(model: Pix2PixOptimizer, epoch: int, save_path: os.path):
     new_Gnet_path = os.path.join(save_path, str(epoch + 1) + '_Gnet')
@@ -191,11 +203,26 @@ if __name__ == '__main__':
     training_images_path = os.path.join(os.getcwd(), 'training')
     if not os.path.exists(training_images_path):
         os.makedirs(training_images_path)
+
+    use_cuda = args.use_cuda
+    use_gan = args.use_GAN
+    is_conditional = args.is_conditional
+    use_l1 = args.use_L1
+    restart = args.restart
+    model_path = args.model_path
+
     # Train a model
-    start_new_training(use_cuda=True, use_GAN=True, is_conditional=False, has_L1=True, no_epochs=200)
+    if not restart and not generate:
+        start_new_training(use_cuda=use_cuda, use_GAN=use_gan, is_conditional=is_conditional, has_L1=use_l1, no_epochs=200)
 
     # Restart a model
-    # restart_training(date_time='20200408_102555', no_epochs=200, use_cuda=True, use_Gan=True, is_conditional=True, has_L1=True)
+    if restart and not model_path is None:
+        restart_training(date_time=model_path, no_epochs=200, use_cuda=use_cuda, use_Gan=use_gan, is_conditional=is_conditional, has_L1=use_l1)
+    else:
+        print("Specify a path to the model!")
 
     # Look at content produced by model
-    # generate('cityscapes', '20200408_102555', 200, use_cuda=False)
+    if generate and not model_path is None:
+        generate('cityscapes', model_path, args.epoch, use_cuda=use_cuda)
+    else:
+        print("Specify a path to the model")

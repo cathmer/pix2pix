@@ -1,6 +1,21 @@
 # pix2pix
 Image to Image translation using PyTorch. 
 
+## Training
+To train the model, run `Train.py` with arguments. To start training:
+```
+python Train.py --use_cuda False --use_GAN True --is_conditional True --use_L1 True 
+```
+See help for specification of options. To restart training with partially trained model (assumes the model is stored in 
+`storage/<folder>` and has names `<epoch_nr>_Dnet` and `<epoch_nr>_Gnet`):
+```
+python Train.py --use_cuda False --use_GAN True --is_conditional True --use_L1 True --restart True --model_path <folder>
+```
+
+To generate images from the validation set:
+```
+python Train.py --use_cuda False --generate True --epoch 200 --model_path <folder>
+```
 
 ## Evaluation
 First, the fcn-8s needs to be downloaded. Do this from the root, by running `./eval_cityscapes/download_fcn8s.sh`. 
