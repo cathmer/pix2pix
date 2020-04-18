@@ -117,11 +117,6 @@ class Pix2PixOptimizer:
             else:
                 loss = loss_L1
 
-        for p in self.discriminator.parameters():
-            print(p.requires_grad)
-
-        print(loss)
-
         # Backward propagate the losses
         loss.backward()
 
