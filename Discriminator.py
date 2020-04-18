@@ -50,3 +50,7 @@ class Discriminator(nn.Module):
     def forward(self, x):
         """Standard forward."""
         return self.model(x)
+
+    def set_requires_grad(self, requires_grad: bool):
+        for parameter in self.parameters():
+            parameter.requires_grad = requires_grad

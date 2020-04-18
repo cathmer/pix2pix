@@ -54,36 +54,42 @@ class Pix2PixOptimizer:
             fake_B = self.generator.forward(real_A)
         return fake_B
 
-    def backward_d_AB(self, A, B, target: bool):
+    def backward_d_AB(self, A, B, target: bool, detach: bool):
         if self.is_conditional:
             # For conditional GAN we want to give both the input image and the generated image to the network
             input_image = torch.cat((A, B), 1)
         else:
             input_image = B
 
-        # Get prediction from discriminator on the generated image. Detach the generated image to prevent back
-        # propagation to the generator
+        # Detach the generated image to prevent back propagation to the generator
+        if detach:
+            input_image = input_image.detach()
+
+        # Get prediction from discriminator on the generated image
         if self.use_cuda:
-            prediction = self.discriminator(input_image.detach().cuda())
+            prediction = self.discriminator(input_image.cuda())
         else:
-            prediction = self.discriminator(input_image.detach())
+            prediction = self.discriminator(input_image)
 
         # Create a target tensor
-        target_tensor1 = torch.tensor(0.0).requires_grad_(target).expand_as(prediction)
+        if target:
+            target_tensor = torch.tensor(1.0).requires_grad_(False).expand_as(prediction)
+        else:
+            target_tensor = torch.tensor(0.0).requires_grad_(False).expand_as(prediction)
 
         # Calculate the GANLoss
         if self.use_cuda:
-            loss = self.GANLoss(prediction.cuda(), target_tensor1.cuda())
+            loss = self.GANLoss(prediction.cuda(), target_tensor.cuda())
         else:
-            loss = self.GANLoss(prediction, target_tensor1)
+            loss = self.GANLoss(prediction, target_tensor)
         return loss
 
     def backward_discriminator(self, real_A, real_B, fake_B):
         # Train on fake image
-        loss_fake = self.backward_d_AB(real_A, fake_B, False)
+        loss_fake = self.backward_d_AB(real_A, fake_B, False, True)
 
         # Train on real
-        loss_real = self.backward_d_AB(real_A, real_B, True)
+        loss_real = self.backward_d_AB(real_A, real_B, True, False)
 
         # Combine the losses calculated above
         loss = 0.5 * (loss_fake + loss_real)
@@ -97,7 +103,7 @@ class Pix2PixOptimizer:
         # If using GAN, put generated image into Discriminator network.
         if self.use_GAN:
             # Train on fake image to fool the discriminator
-            loss = self.backward_d_AB(real_A, fake_B, True)
+            loss = self.backward_d_AB(real_A, fake_B, True, False)
 
         if self.has_L1:
             # Calculate the L1 Loss between the generated image and the real image.
@@ -110,6 +116,11 @@ class Pix2PixOptimizer:
                 loss = loss + loss_L1
             else:
                 loss = loss_L1
+
+        for p in self.discriminator.parameters():
+            print(p.requires_grad)
+
+        print(loss)
 
         # Backward propagate the losses
         loss.backward()
@@ -124,7 +135,6 @@ class Pix2PixOptimizer:
             real_A = images['A']
             real_B = images['B']
 
-        generator_loss = 0.0
         discriminator_loss = 0.0
 
         # Generate fake image from a semantic image
@@ -133,8 +143,7 @@ class Pix2PixOptimizer:
         # Update the discriminator if GAN is used
         if self.use_GAN:
             # Enable backpropagation for the discriminator
-            for parameter in self.discriminator.parameters():
-                parameter.requires_grad = True
+            self.discriminator.set_requires_grad(True)
             # Set the gradients to zero
             self.discriminator_optimizer.zero_grad()
             # Calculate the new gradients
@@ -144,8 +153,7 @@ class Pix2PixOptimizer:
 
         # Update Generator
         # Don't calculate gradients for D when optimizing G
-        for parameter in self.discriminator.parameters():
-            parameter.requires_grad = False
+        self.discriminator.set_requires_grad(False)
         # Set gradients to zero
         self.generator_optimizer.zero_grad()
         # Calculate gradients
