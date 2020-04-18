@@ -86,7 +86,7 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
                 break
             else:
                 model.set_input(data)
-                gloss, dloss = model.optimize()
+                gloss, dloss = model.optimize(data)
                 gloss = gloss.item()
                 dloss = dloss.item()
 
