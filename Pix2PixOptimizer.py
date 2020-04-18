@@ -154,4 +154,4 @@ class Pix2PixOptimizer:
         self.generator_optimizer.step()
 
         # Return the error
-        return generator_loss, discriminator_loss
+        return generator_loss, discriminator_loss, fake_B
