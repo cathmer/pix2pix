@@ -75,7 +75,7 @@ def print_avg_losses(epoch: int, no_epochs: int, cumulative_generator_loss: floa
 
 
 def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save_path: os.path, start: int,
-          debug: bool = True):
+          debug: bool = False):
     no_images = len(data_loader)
 
     for i in range(start - 1, no_epochs):
