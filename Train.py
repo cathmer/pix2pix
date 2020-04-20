@@ -45,10 +45,11 @@ def get_trained_pix2pix(path_to_Gnet: os.path,
     model = Pix2PixOptimizer(is_train=is_train, use_GAN=use_Gan, is_conditional=is_conditional, has_L1=has_L1,
                              use_cuda=use_cuda)
     model.generator.load_state_dict(torch.load(path_to_Gnet))
-    model.generator_optimizer.load_state_dict(torch.load(path_to_Gopt))
+    if is_train:
+        model.generator_optimizer.load_state_dict(torch.load(path_to_Gopt))
     model.generator.eval()
 
-    if path_to_Dnet is not None:
+    if path_to_Dnet is not None and is_train:
         model.discriminator.load_state_dict(torch.load(path_to_Dnet))
         model.discriminator_optimizer.load_state_dict(torch.load(path_to_Dopt))
         model.discriminator.eval()
@@ -89,8 +90,6 @@ def train(model: Pix2PixOptimizer, data_loader: DataLoader, no_epochs: int, save
                 break
             else:
                 generator_loss, discriminator_loss, fake_B = model.optimize(data)
-                generator_loss = generator_loss.item()
-                discriminator_loss = discriminator_loss.item()
 
                 cumulative_generator_loss += generator_loss
                 cumulative_discriminator_loss += discriminator_loss
@@ -163,29 +162,33 @@ def restart_training(date_time: str, no_epochs: int, use_cuda: bool, use_Gan: bo
         print("Directory not present.")
 
 
-# def generate(dataset: str, date_time: str, epoch: int, use_cuda: bool, no_images: int = 10):
-#     path = os.path.join(os.getcwd(), 'storage', date_time, str(epoch) + '_Gnet')
-#     print(path)
+def generate(dataset: str, date_time: str, epoch: int, use_cuda: bool, no_images: int = 10):
+    Gnet_path = os.path.join(os.getcwd(), 'storage', date_time, str(epoch) + '_Gnet')
 
-#     storage_path = os.path.join(os.getcwd(), 'results', dataset, datetime.now().strftime('%Y%m%d_%H%M%S'))
-#     os.makedirs(storage_path)
+    storage_path = os.path.join(os.getcwd(), 'results', dataset, datetime.now().strftime('%Y%m%d_%H%M%S'))
+    os.makedirs(storage_path)
 
-#     if os.path.isfile(path):
-#         model = get_trained_pix2pix(path_to_Gnet=path, path_to_Dnet=None, use_cuda=use_cuda, use_Gan=True,
-#                                     is_conditional=True, has_L1=True)
-#         data_loader = DataGenerator.get_data_loader(os.path.join(os.getcwd(), 'dataset', dataset, 'val'), 1,
-#                                                     shuffle=False)
+    if os.path.isfile(Gnet_path):
+        model = get_trained_pix2pix(path_to_Gnet=Gnet_path,
+                                    path_to_Dnet=None,
+                                    path_to_Gopt=None,
+                                    path_to_Dopt=None,
+                                    use_cuda=use_cuda,
+                                    use_Gan=True,
+                                    is_conditional=True,
+                                    has_L1=True)
+        data_loader = DataGenerator.get_data_loader(os.path.join(os.getcwd(), 'dataset', dataset, 'val'), 1,
+                                                    shuffle=False)
 
-#         for j, data in enumerate(data_loader):
-#             if j < no_images:
-#                 print("Generated picture " + str(j + 1))
-#                 model.set_input(data)
-#                 image = model.forward(return_image=True)
-#                 torchvision.utils.save_image(image, os.path.join(storage_path, str(j + 1) + '_generated.png'))
-#             else:
-#                 break
-#     else:
-#         print("Unable to generate, model not present.")
+        for j, data in enumerate(data_loader):
+            if j < no_images:
+                print("Generated picture " + str(j + 1))
+                image = model.generate(data)
+                torchvision.utils.save_image(image, os.path.join(storage_path, str(j + 1) + '_generated.png'))
+            else:
+                break
+    else:
+        print("Unable to generate, model not present.")
 
 
 if __name__ == '__main__':
@@ -193,10 +196,10 @@ if __name__ == '__main__':
     if not os.path.exists(training_images_path):
         os.makedirs(training_images_path)
     # Train a model
-    start_new_training(use_cuda=True, use_GAN=True, is_conditional=False, has_L1=False, no_epochs=200)
+    start_new_training(use_cuda=False, use_GAN=False, is_conditional=False, has_L1=True, no_epochs=200)
 
     # Restart a model
     # restart_training(date_time='20200418_221557', no_epochs=200, use_cuda=True, use_Gan=True, is_conditional=False, has_L1=False)
 
     # Look at content produced by model
-    # generate('cityscapes', '20200408_102555', 200, use_cuda=False)
+    #generate('cityscapes', '20200418_221557', 10, use_cuda=False)

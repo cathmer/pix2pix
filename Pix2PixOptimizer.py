@@ -143,6 +143,7 @@ class Pix2PixOptimizer:
             self.discriminator_optimizer.zero_grad()
             # Calculate the new gradients
             discriminator_loss = self.backward_discriminator(real_A, real_B, fake_B)
+            discriminator_loss = discriminator_loss.item()
             # Update weights
             self.discriminator_optimizer.step()
 
@@ -153,8 +154,15 @@ class Pix2PixOptimizer:
         self.generator_optimizer.zero_grad()
         # Calculate gradients
         generator_loss = self.backward_generator(real_A, real_B, fake_B)
+        generator_loss = generator_loss.item()
         # Update weights
         self.generator_optimizer.step()
 
         # Return the error
         return generator_loss, discriminator_loss, fake_B
+
+    def generate(self, images):
+        if self.use_cuda:
+            return self.forward(images['A'].cuda())
+        else:
+            return self.forward(images['A'])
