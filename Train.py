@@ -222,11 +222,11 @@ if __name__ == '__main__':
     # Restart a model
     if restart and not model_path is None:
         restart_training(date_time=model_path, no_epochs=200, use_cuda=use_cuda, use_Gan=use_gan, is_conditional=is_conditional, has_L1=use_l1)
-    else:
+    elif restart and model_path is None:
         print("Specify a path to the model!")
 
     # Look at content produced by model
     if generate and not model_path is None:
         generate('cityscapes', model_path, args.epoch, use_cuda=use_cuda)
-    else:
+    elif generate and model_path is None:
         print("Specify a path to the model")
