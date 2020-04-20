@@ -213,6 +213,7 @@ if __name__ == '__main__':
     is_conditional = args.is_conditional
     use_l1 = args.use_L1
     restart = args.restart
+    generate = args.generate
     model_path = args.model_path
 
     # Train a model
