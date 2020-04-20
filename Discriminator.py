@@ -8,10 +8,7 @@ N_INNER_LAYERS = 3
 
 class Discriminator(nn.Module):
     def __init__(self, input_channels):
-        # TODO: Set Parameter for number of input channels (can be 3 for GAN, 6 for cGAN)
-        """ Parameters:
-        """
-        super().__init__()
+        super(Discriminator, self).__init__()
         use_bias = False
         filter_size = 4
         padding_width = 1
@@ -53,3 +50,7 @@ class Discriminator(nn.Module):
     def forward(self, x):
         """Standard forward."""
         return self.model(x)
+
+    def set_requires_grad(self, requires_grad: bool):
+        for parameter in self.parameters():
+            parameter.requires_grad = requires_grad
